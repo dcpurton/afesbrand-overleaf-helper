@@ -387,8 +387,8 @@ async function downloadOutputFile(filename) {
 }
 
 /**
- * Checks whether the afesbrand.sty in the current Overleaf project is
- * up to date with the latest GitHub release.
+ * Checks whether the current Overleaf project is an AFES Brand Factory project
+ * and whether afesbrand.sty is up to date with the latest GitHub release.
  *
  * If a newer version is available, updates the status bar with a warning.
  * Silently does nothing if the version cannot be determined.
@@ -396,16 +396,30 @@ async function downloadOutputFile(filename) {
  * @param {string} latestVersion - The latest version string from GitHub.
  * @returns {Promise<void>}
  */
-async function checkAFESBrandStyVersion(latestVersion) {
+async function checkAFESBrandFactoryProject(latestVersion) {
   const result = await getOutputFileUrl('output.log');
-  if (!result.ok) return;
+  if (!result.ok) {
+    setStatus('error', 'Compile the project first');
+    setBtnDisabledState(true);
+    return;
+  }
   const payload = await runInTab(result.tab.id, page_fetchToPayload, [result.url, 'text/plain']);
-  if (!payload?.ok) return;
+  if (!payload?.ok) {
+    setStatus('error', 'Project needs to be recompiled');
+    setBtnDisabledState(true);
+    return;
+  }
   const m = payload.data.match(/^Package: afesbrand \S+ v(\S+)/m);
-  if (!m) return;
+  if (!m) {
+    setStatus('error', 'This project does not seem to be an AFES Brand Factory project');
+    setBtnDisabledState(true);
+    return;
+  }
   const styVersion = m[1];
   if (styVersion !== latestVersion) {
     setStatus('error', `Update available: v${styVersion} → v${latestVersion}`);
+  } else {
+    setReady();
   }
 }
 
@@ -485,11 +499,8 @@ async function fetchAFESBrandVersion() {
       }
       return;
     }
-
-    setReady();
-
     if (latestVersion) {
-      checkAFESBrandStyVersion(latestVersion);
+      checkAFESBrandFactoryProject(latestVersion);
     }
   } catch (err) {
     setStatus('error', 'Init error: ' + err.message);
