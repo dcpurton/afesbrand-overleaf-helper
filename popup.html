@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: Livvic, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 14px;
+      font-weight: 400;
+      width: 280px;
+      background: #9AD9E9;
+      color: #242C37;
+      padding: 14px;
+    }
+
+    h2 {
+      font-size: 16px;
+      font-family: Livvic;
+      font-weight: 900;
+      color: #34613B;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    h3 {
+      font-size: 14px;
+      font-family: Livvic;
+      font-weight: 700;
+      color: #242C37;
+      margin-top: 8px;
+      margin-bottom: 5px;
+    }
+
+    .status-bar {
+      font-family: Livvic;
+      font-weight: 300;
+      font-size: 14px;
+      padding: 5px 8px;
+      border-radius: 4px;
+      margin-bottom: 12px;
+      background: #242C37;
+      color: white;
+      border: 1px solid #242C37;
+      min-height: 28px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .status-bar .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #E6E6DF;
+      flex-shrink: 0;
+    }
+
+    .status-bar.ready .dot  { background: #6BB07D; }
+    .status-bar.error .dot  { background: #FF6622; }
+    .status-bar.success .dot { background: #6BB07D; }
+    .status-bar.working .dot {
+      background: #EFD954;
+      animation: pulse 0.8s infinite alternate;
+    }
+
+    @keyframes pulse { from { opacity: 1; } to { opacity: 0.3; } }
+
+    hr {
+      border: none;
+      height: 0;
+      border-top: 1px solid #242C37;
+      margin: 12px 0;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .btn-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    button {
+      font-family: Livvic;
+      font-weight: 600;
+      width: 100%;
+      padding: 10px 14px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background-color: #E6E6DF;
+      transition: filter 0.15s, transform 0.1s;
+    }
+
+    button:hover  { filter: brightness(1.15); }
+    button:active { transform: scale(0.97); }
+    button:disabled { opacity: 0.4; cursor: not-allowed; }
+    button:focus-visible { outline: 2px solid #242C37; outline-offset: 2px; }
+
+    .btn-svg {
+      background: #FF6622;
+      color: white;
+    }
+
+    .btn-png {
+      background: #34613B;
+      color: white;
+    }
+
+    .btn-dnld-svg {
+      background: #FFC88D;
+      color: #242C37;
+    }
+
+    .btn-dnld-png {
+      background: #6BB07D;
+      color: #242C37;
+    }
+
+    .btn-dnld-pdf {
+      background: #FFBAFF;
+      color: #242C37;
+    }
+
+    .ph-fill {
+      width: 16px;
+      height: 16px;
+      display:inline-block;
+    }
+
+    .btn-label {
+      display: flex;
+      flex-direction: column;
+      text-align: left;
+    }
+
+    .tgl-label {
+      margin-top: 8px;
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      font-size: 14px;
+    }
+
+    input[type="checkbox"] {
+      accent-color: #006CC5;
+    }
+  </style>
+</head>
+<body>
+  <h2>AFES Brand Factory</h2>
+
+  <div class="status-bar" id="statusBar" role="status" aria-live="polite">
+    <div class="dot"></div>
+    <span id="statusTxt">Checking...</span>
+  </div>
+
+
+  <div class="btn-group">
+    <h3>Clipboard</h3>
+
+    <button class="btn-svg" id="btnSvg" disabled aria-label="Copy compiled graphic as SVG">
+      <img class="ph-fill" src="icons/shapes-fill.svg" alt="" aria-hidden="true">
+      <div class="btn-label">
+        Copy as SVG
+      </div>
+    </button>
+
+    <button class="btn-png" id="btnPng" disabled aria-label="Copy compiled graphic as PNG">
+      <img class="ph-fill" src="icons/image-square-fill.svg" alt="" aria-hidden="true">
+      <div class="btn-label">
+        Copy as PNG
+      </div>
+    </button>
+
+    <h3>Download</h3>
+
+    <button class="btn-dnld-pdf" id="btnDnldPdf" disabled aria-label="Download compiled PDF">
+      <img class="ph-fill" src="icons/file-pdf-fill.svg" alt="" aria-hidden="true">
+      <div class="btn-label">
+        Download as PDF
+      </div>
+    </button>
+
+    <button class="btn-dnld-svg" id="btnDnldSvg" disabled aria-label="Download compiled SVG">
+      <img class="ph-fill" src="icons/file-svg-fill.svg" alt="" aria-hidden="true">
+      <div class="btn-label">
+        Download as SVG
+      </div>
+    </button>
+
+    <button class="btn-dnld-png" id="btnDnldPng" disabled aria-label="Download compiled PNG">
+      <img class="ph-fill" src="icons/file-png-fill.svg" alt="" aria-hidden="true">
+      <div class="btn-label">
+        Download as PNG
+      </div>
+    </button>
+
+    <label class="tgl-label">
+      <input type="checkbox" id="saveAsTgl" />
+      Prompt for location ("Save As. . .")
+    </label>    
+  </div>
+
+  <div class="btn-group">
+    <h3 style="margin-top: 12px;">Overleaf</h3>
+
+    <button class="btn-overleaf-new" id="btnOlNew" aria-label="Create New"
+        title="Create a new Overleaf project from the latest AFESBrand template">
+      <img class="ph-fill" src="icons/box-arrow-up-fill.svg" alt="" aria-hidden="true">
+      <div class="btn-label" id="btnOlNewLabel">
+        Create new
+      </div>
+    </button>
+
+    <button class="btn-overleaf-open hidden" id="btnOlOpen" aria-label="Open"
+        title="Activate or open the most recent AFESBrand Overleaf project">
+      <img class="ph-fill" src="icons/arrow-square-out-fill.svg" alt="" aria-hidden="true">
+      <div class="btn-label">
+        Open
+      </div>
+    </button>
+    
+  </div>
+  
+  <script src="popup.js"></script>
+</body>
+</html>
