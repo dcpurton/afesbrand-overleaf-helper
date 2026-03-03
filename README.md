@@ -21,7 +21,8 @@ indicates when a new `afesbrand` package version is available.
 
 Icons by [Phosphor Icons](https://phosphoricons.com) (MIT licence).
 
-Developed with assistance from [Claude](https://claude.ai) (Anthropic) and
+Developed with assistance from [Claude](https://claude.ai) (Anthropic),
+[Copilot](https://copilot.microsoft.com) (Microsoft) and
 [ChatGPT](https://chatgpt.com) (OpenAI).
 
 ## Privacy Policy
