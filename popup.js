@@ -417,7 +417,8 @@ async function checkAFESBrandFactoryProject(latestVersion) {
   }
   const styVersion = m[1];
   if (styVersion !== latestVersion) {
-    setStatus('error', `Update available: v${styVersion} → v${latestVersion}`);
+    setStatus('info', `Update available: v${styVersion} → v${latestVersion}`);
+    setBtnDisabledState(false);
   } else {
     setReady();
   }
