@@ -162,15 +162,14 @@ async function runInTab(tabId, func, args = [], timeoutMs = 7000) {
  *   Returns `null` if no matching output is found.
  */
 function page_findBuild(pid) {
-  const entries = performance.getEntriesByType('resource');
-  for (let i = entries.length - 1; i >= 0; i--) {
-    const url = entries[i].name;
-    const m = url.match(
+  const links = document.querySelectorAll('a[href*="/build/"][href*="/output/"]');
+  for (const link of links) {
+    const m = link.href.match(
       new RegExp(`/project/${pid}/user/([^/]+)/build/([^/]+)/output/([^?]+)`)
     );
     if (m) {
-      const [_, userId, buildId, file] = m;
-      return { userId, buildId, lastFile: file };
+      const [_, userId, buildId, lastFile] = m;
+      return { userId, buildId, lastFile };
     }
   }
   return null;
@@ -276,7 +275,6 @@ async function getOutputFileUrl(filename) {
   const url = makeOutputUrl(projectId, found.userId, found.buildId, filename);
   return { ok: true, tab, url };
 }
-
 
 /**
  * Copies an Overleaf output file to the system clipboard.
