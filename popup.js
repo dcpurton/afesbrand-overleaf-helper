@@ -385,6 +385,32 @@ async function downloadOutputFile(filename) {
 }
 
 /**
+ * Determines whether one version string is more recent than another.
+ *
+ * Compares two version strings in the format [major].[minor][optional letter]
+ * (e.g. "1.2", "1.2a", "1.10b"). Comparison is performed by major, then
+ * minor, then patch letter (where no letter is considered older than 'a').
+ *
+ * @param {string} latest - The version string to test as potentially newer.
+ * @param {string} current - The version string to test against.
+ * @returns {boolean} True if `latest` is strictly newer than `current`,
+ *   false otherwise (including if either version string cannot be parsed).
+ */
+function isNewerVersion(latest, current) {
+  const parse = v => {
+    const m = v.match(/^(\d+)\.(\d+)([a-z]?)$/i);
+    if (!m) return null;
+    return { major: parseInt(m[1]), minor: parseInt(m[2]), patch: m[3].toLowerCase() };
+  };
+  const l = parse(latest);
+  const c = parse(current);
+  if (!l || !c) return false;
+  if (l.major !== c.major) return l.major > c.major;
+  if (l.minor !== c.minor) return l.minor > c.minor;
+  return l.patch > c.patch; // '' < 'a' < 'b' etc. in JS string comparison
+}
+
+/**
  * Checks whether the current Overleaf project is an AFES Brand Factory project
  * and whether afesbrand.sty is up to date with the latest GitHub release.
  *
@@ -414,7 +440,7 @@ async function checkAFESBrandFactoryProject(latestVersion) {
     return;
   }
   const styVersion = m[1];
-  if (styVersion !== latestVersion) {
+  if (isNewerVersion(latestVersion, styVersion)) {
     setStatus('info', `Update available: v${styVersion} → v${latestVersion}`);
     setBtnDisabledState(false);
   } else {
