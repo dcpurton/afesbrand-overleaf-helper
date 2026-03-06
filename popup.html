@@ -215,7 +215,7 @@
   <div class="btn-group">
     <h3 style="margin-top: 12px;">Overleaf</h3>
 
-    <button class="btn-overleaf-new" id="btnOlNew" aria-label="Create New"
+    <button id="btnOlNew" aria-label="Create New"
         title="Create a new Overleaf project from the latest AFESBrand template">
       <img class="ph-fill" src="icons/box-arrow-up-fill.svg" alt="" aria-hidden="true">
       <div class="btn-label" id="btnOlNewLabel">
@@ -223,14 +223,26 @@
       </div>
     </button>
 
-    <button class="btn-overleaf-open hidden" id="btnOlOpen" aria-label="Open"
-        title="Activate or open the most recent AFESBrand Overleaf project">
-      <img class="ph-fill" src="icons/arrow-square-out-fill.svg" alt="" aria-hidden="true">
-      <div class="btn-label">
-        Open
-      </div>
-    </button>
-    
+    <div id="btnOlOpenHelpRow" style="display: flex; gap: 8px;">
+      <button class="hidden" id="btnOlOpen" aria-label="Open"
+          title="Activate or open the most recent AFESBrand Overleaf project"
+          style="flex: 1;">
+        <img class="ph-fill" src="icons/arrow-square-out-fill.svg" alt="" aria-hidden="true">
+        <div class="btn-label">
+          Open
+        </div>
+      </button>
+
+      <button id="btnOlHelp" aria-label="Help"
+          title="Activate or open afesbrand LaTeX package documentation"
+          style="flex: 1;">
+        <img class="ph-fill" src="icons/question-fill.svg" alt="" aria-hidden="true">
+        <div class="btn-label">
+          Help
+        </div>
+      </button>
+    </div>
+
   </div>
   
   <script src="popup.js"></script>

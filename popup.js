@@ -10,7 +10,12 @@ const btnDnldPng    = document.getElementById('btnDnldPng');
 const saveAsTgl     = document.getElementById('saveAsTgl');
 const btnOlOpen     = document.getElementById('btnOlOpen');
 const btnOlNew      = document.getElementById('btnOlNew');
+const btnOlHelp     = document.getElementById('btnOlHelp');
 const btnOlNewLabel = document.getElementById('btnOlNewLabel');
+
+// Globals
+
+const AFES_HELP_VIEWER_URL = `https://docs.google.com/viewer?url=${encodeURIComponent("https://github.com/dcpurton/afesbrand/releases/latest/download/afesbrand.pdf")}`;
 
 
 // UI helpers
@@ -385,6 +390,29 @@ async function downloadOutputFile(filename) {
 }
 
 /**
+ * Opens the latest afesbrand documentation in a new tab using the Google Docs
+ * viewer, or activates the existing tab if it was previously opened by this
+ * extension.
+ *
+ * Using the Google Docs viewer avoids GitHub's forced download behaviour
+ * (Content-Disposition: attachment) without requiring blob URL workarounds
+ * or additional host permissions. The viewer URL is deterministic, which
+ * allows reliably detecting an already-open tab via chrome.tabs.query.
+ *
+ * @requires permissions: "tabs"
+ *
+ * @returns {Promise<void>}
+ */
+async function focusOrOpenAfesbrandHelp() {
+  const [existingTab] = await chrome.tabs.query({ url: `${AFES_HELP_VIEWER_URL}*` });
+  if (existingTab) {
+    await chrome.tabs.update(existingTab.id, { active: true });
+    return;
+  }
+  chrome.tabs.create({ url: AFES_HELP_VIEWER_URL });
+}
+
+/**
  * Determines whether one version string is more recent than another.
  *
  * Compares two version strings in the format [major].[minor][optional letter]
@@ -511,6 +539,9 @@ async function fetchAFESBrandVersion() {
 
 // Set initial state.
 (async () => {
+  const allActive = await chrome.tabs.query({ active: true });
+  const helpIsActive = allActive.some(t => t.url?.startsWith(AFES_HELP_VIEWER_URL));
+  if (helpIsActive) btnOlHelp.classList.add('hidden');
   await loadSaveAsPreference();
   wireSaveAsPersistence();
   const latestVersion = await fetchAFESBrandVersion();
@@ -562,3 +593,4 @@ btnOlNew.addEventListener('click', () => {
 
 btnOlOpen.addEventListener('click', focusOrOpenProjectTab);
 
+btnOlHelp.addEventListener('click', focusOrOpenAfesbrandHelp);

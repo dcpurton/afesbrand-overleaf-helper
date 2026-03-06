@@ -15,7 +15,8 @@ SOURCES := \
 	icons/file-png-fill.svg \
 	icons/file-svg-fill.svg \
 	icons/image-square-fill.svg \
-	icons/shapes-fill.svg
+	icons/shapes-fill.svg \
+	icons/question-fill.svg
 
 .PHONY: pack clean
 
