@@ -21,6 +21,8 @@ indicates when a new `afesbrand` package version is available.
 
 Icons by [Phosphor Icons](https://phosphoricons.com) (MIT licence).
 
+[Livvic font family](https://github.com/Fonthausen/Livvic) design by Jacques Le Bailly (SIL Open Font License Version 1.1)
+
 Developed with assistance from [Claude](https://claude.ai) (Anthropic),
 [Copilot](https://copilot.microsoft.com) (Microsoft) and
 [ChatGPT](https://chatgpt.com) (OpenAI).
