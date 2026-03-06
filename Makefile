@@ -2,7 +2,9 @@ ZIPFILE := afesbrand-overleaf-helper.zip
 
 SOURCES := \
 	manifest.json \
+	content_script.js \
 	background.js \
+	interceptor.js \
 	popup.html \
 	popup.js \
 	icons/icon16.png \
@@ -24,7 +26,7 @@ pack: $(ZIPFILE)
 
 $(ZIPFILE): $(SOURCES)
 	rm -f $@
-	zip $@ manifest.json background.js popup.html popup.js
+	zip $@ manifest.json content_script.js background.js interceptor.js popup.html popup.js
 	zip -r $@ icons/
 
 clean:

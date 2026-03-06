@@ -30,6 +30,11 @@ Developed with assistance from [Claude](https://claude.ai) (Anthropic),
 AFES Brand Factory Overleaf Helper does not collect, transmit, or share any
 personal data.
 
+The extension injects a script solely to intercept Overleaf's internal compile
+response to extract a build ID from the response URL. No request data,
+response bodies, or user data are read or transmitted. The interceptor
+operates only on `overleaf.com/project/*` pages.
+
 The extension stores three values locally on your device using Chrome's
 `storage.local` API: the most recently used Overleaf project ID, its
 associated tab ID, and your "Save As" download preference. This data never

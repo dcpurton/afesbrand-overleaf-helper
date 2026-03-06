@@ -156,9 +156,6 @@ async function runInTab(tabId, func, args = [], timeoutMs = 7000) {
 /**
  * Finds the most recent Overleaf output file for a given project ID.
  *
- * Searches the browser's performance resource entries for a URL matching the
- * Overleaf project build output pattern.
- *
  * @param {string} pid - The Overleaf project ID to search for.
  * @returns {{userId: string, buildId: string, lastFile: string} | null} An object containing:
  *   - `userId`: The ID of the user who built the project.
@@ -167,15 +164,9 @@ async function runInTab(tabId, func, args = [], timeoutMs = 7000) {
  *   Returns `null` if no matching output is found.
  */
 function page_findBuild(pid) {
-  const links = document.querySelectorAll('a[href*="/build/"][href*="/output/"]');
-  for (const link of links) {
-    const m = link.href.match(
-      new RegExp(`/project/${pid}/user/([^/]+)/build/([^/]+)/output/([^?]+)`)
-    );
-    if (m) {
-      const [_, userId, buildId, lastFile] = m;
-      return { userId, buildId, lastFile };
-    }
+  const cache = window.__overleafBuildCache;
+  if (cache?.projectId === pid) {
+    return { userId: cache.userId, buildId: cache.buildId, lastFile: cache.lastFile };
   }
   return null;
 }
@@ -447,8 +438,9 @@ function isNewerVersion(latest, current) {
 }
 
 /**
- * Checks whether the current Overleaf project is an AFES Brand Factory project
- * and whether afesbrand.sty is up to date with the latest GitHub release.
+ * Checks whether the current Overleaf project is an AFES Brand Factory
+ * project, whether the project is compiled, and whether afesbrand.sty is up to
+ * date with the latest GitHub release.
  *
  * If a newer version is available, updates the status bar with a warning.
  * Silently does nothing if the version cannot be determined.
@@ -457,24 +449,46 @@ function isNewerVersion(latest, current) {
  * @returns {Promise<void>}
  */
 async function checkAFESBrandFactoryProject(latestVersion) {
+  const tab = await getActiveTab();
+
+  // Check if the interceptor is active; if not, the page was open before the
+  // extension was installed/updated and needs a reload to hook into fetch.
+  const interceptorActive = await runInTab(
+  tab.id,
+  () => document.documentElement.dataset.overleafInterceptorActive === 'true'
+);
+  if (!interceptorActive) {
+    setStatus('error', 'Reload the Overleaf page to activate');
+    setBtnDisabledState(true);
+    return;
+  }
+
+  // Check if output.log exists
   const result = await getOutputFileUrl('output.log');
   if (!result.ok) {
     setStatus('error', 'Compile the project first');
     setBtnDisabledState(true);
     return;
   }
+
+  // Check if output has been cleaned by Overleaf
   const payload = await runInTab(result.tab.id, page_fetchToPayload, [result.url, 'text/plain']);
   if (!payload?.ok) {
     setStatus('error', 'Project needs to be recompiled');
     setBtnDisabledState(true);
     return;
   }
+
+  // Check if this is really and AFES Brand Factory project by ensuring that
+  // the project loads afesbrand.sty
   const m = payload.data.match(/^Package: afesbrand \S+ v(\S+)/m);
   if (!m) {
     setStatus('error', 'This project does not seem to be an AFES Brand Factory project');
     setBtnDisabledState(true);
     return;
   }
+
+  // Check for a newer version (info only)
   const styVersion = m[1];
   if (isNewerVersion(latestVersion, styVersion)) {
     setStatus('info', `Update available: v${styVersion} → v${latestVersion}`);

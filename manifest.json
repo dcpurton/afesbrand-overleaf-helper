@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "AFES Brand Factory Overleaf Helper",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Copies or downloads compiled files from an AFES Brand Factory Overleaf project",
   "homepage_url": "https://github.com/dcpurton/afesbrand-overleaf-helper",
   "minimum_chrome_version": "116",
@@ -19,6 +19,15 @@
   "background": {
     "service_worker": "background.js"
   },
+  "content_scripts": [{
+    "matches": ["https://www.overleaf.com/project/*"],
+    "js": ["content_script.js"],
+    "run_at": "document_start"
+  }],
+  "web_accessible_resources": [{
+    "resources": ["interceptor.js"],
+    "matches": ["https://www.overleaf.com/*"]
+  }],
   "action": {
     "default_popup": "popup.html",
     "default_title": "AFES Brand Factory Overleaf Helper",
