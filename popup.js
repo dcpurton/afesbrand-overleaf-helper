@@ -315,7 +315,8 @@ async function copyOutputFile(filename, mimeType) {
 /**
  * Writes a payload to the system clipboard with a specified MIME type.
  *
- * Handles both text and Base64-encoded binary payloads.
+ * Handles both text and Base64-encoded binary payloads. image/svg+xml is also
+ * written as text/plain for compatibility with Affinity.
  *
  * @param {string} mimeType - The MIME type for the clipboard data.
  * @param {{data: string, encoding: 'text' | 'base64'}} payload - The payload to write:
@@ -335,9 +336,16 @@ async function writeToClipboard(mimeType, payload) {
     }
   });
 
-  await navigator.clipboard.write([
-    new ClipboardItem({ [mimeType]: blobPromise })
-  ]);
+  const clipboardItem = mimeType === 'image/svg+xml'
+    ? new ClipboardItem({
+        'image/svg+xml': blobPromise,
+        'text/plain': blobPromise.then(blob => blob.text()).then(text =>
+          new Blob([text], { type: 'text/plain' })
+        ),
+      })
+    : new ClipboardItem({ [mimeType]: blobPromise });
+
+  await navigator.clipboard.write([clipboardItem]);
 }
 
 /**
