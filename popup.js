@@ -23,7 +23,7 @@ const AFES_HELP_VIEWER_URL = `https://docs.google.com/viewer?url=${encodeURIComp
 /**
  * Set the status bar state and message.
  *
- * @param {'ready' | 'error' | 'working' | 'success' } state - The status bar state.
+ * @param {'ready' | 'error' | 'working' | 'success' | 'info' } state - The status bar state.
  * @param {string} msg - The status bar message.
  * @returns {void}
  */
