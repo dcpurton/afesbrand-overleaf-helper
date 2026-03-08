@@ -94,7 +94,10 @@ function tryParseProjectId(urlStr) {
  */
 async function focusOrOpenProjectTab() {
   const { projectId, tabId } = await chrome.storage.local.get(['projectId', 'tabId']);
-  if (!projectId) return;
+  if (!projectId) {
+    focusOrOpenAllProjects();
+    return;
+  }
 
   const url = `https://www.overleaf.com/project/${projectId}`;
 
@@ -119,6 +122,24 @@ async function focusOrOpenProjectTab() {
     await chrome.tabs.create({ url });
   }
 }
+
+/**
+ * Activate or open Overleaf projects list
+ *
+ * @returns {Promise<void>}
+ */
+async function focusOrOpenAllProjects() {
+  const url = "https://www.overleaf.com/project";
+
+  const [existing] = await chrome.tabs.query({ url: url });
+  if (existing) {
+    await chrome.tabs.update(existing.id, { active: true });
+    await chrome.windows.update(existing.windowId, { focused: true });
+  } else {
+    await chrome.tabs.create({ url });
+  }
+}
+
 
 /**
  * Executes a function in a specific Chrome tab using the scripting API.
@@ -570,12 +591,12 @@ async function fetchAFESBrandVersion() {
   const { projectId, tabId } = await chrome.storage.local.get(['projectId', 'tabId']);
   try {
     const tab = await getActiveTab();
-    if (!tab.url?.includes('overleaf.com/project/')) {
+    if (!tab.url?.includes('overleaf.com/project')) {
       setStatus('error', 'Open AFESBrandFactory Overleaf project tab first');
-      if (projectId) {
-        btnOlOpen.classList.remove('hidden');
-      }
+      btnOlOpen.classList.remove('hidden');
       return;
+    } else {
+      btnOlOpen.classList.add('hidden');
     }
     if (latestVersion) {
       checkAFESBrandFactoryProject(latestVersion);
