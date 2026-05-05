@@ -182,12 +182,22 @@ async function runInTab(tabId, func, args = [], timeoutMs = 7000) {
  *   - `userId`: The ID of the user who built the project.
  *   - `buildId`: The build identifier.
  *   - `lastFile`: The most recent output file name.
+ *   - `clsiServerId`: The CLSI Server ID.
+ *   - `editorId`: The editor ID.
+ *   - `compileGroup`: The compile group.
  *   Returns `null` if no matching output is found.
  */
 function page_findBuild(pid) {
   const cache = window.__overleafBuildCache;
   if (cache?.projectId === pid) {
-    return { userId: cache.userId, buildId: cache.buildId, lastFile: cache.lastFile };
+    return {
+      userId: cache.userId,
+      buildId: cache.buildId,
+      lastFile: cache.lastFile,
+      clsiServerId: cache.clsiServerId || '',
+      editorId: cache.editorId || '',
+      compileGroup: cache.compileGroup || '',
+    };
   }
   return null;
 }
@@ -254,14 +264,23 @@ async function page_fetchToPayload(url, mime) {
 /**
  * Constructs the URL for a specific Overleaf project output file.
  *
- * @param {string} pid      - The Overleaf project ID.
- * @param {string} userId   - The user ID who built the project.
- * @param {string} buildId  - The build ID.
- * @param {string} filename - The output file name.
+ * @param {string} pid          - The Overleaf project ID.
+ * @param {string} userId       - The user ID who built the project.
+ * @param {string} buildId      - The build ID.
+ * @param {string} filename     - The output file name.
+ * @param {string} clsiServerId - The CLSI Server ID.
+ * @param {string} editorId     - The editor ID.
+ * @param {string} compileGroup - The compile group.
  * @returns {string} The full URL pointing to the Overleaf output file.
  */
-function makeOutputUrl(pid, userId, buildId, filename) {
-  return `https://www.overleaf.com/project/${pid}/user/${userId}/build/${buildId}/output/${filename}`;
+function makeOutputUrl(pid, userId, buildId, filename, clsiServerId, editorId, compileGroup) {
+  const base = `https://www.overleaf.com/project/${pid}/user/${userId}/build/${buildId}/output/${filename}`;
+  const params = new URLSearchParams();
+  if (clsiServerId) params.set('clsiserverid', clsiServerId);
+  if (editorId)     params.set('editorId', editorId);
+  if (compileGroup) params.set('compileGroup', compileGroup);
+  const qs = params.toString();
+  return qs ? `${base}?${qs}` : base;
 }
 
 
@@ -289,7 +308,8 @@ async function getOutputFileUrl(filename) {
     return { ok: false, msg: 'No build detected — compile the project and try again' };
   }
 
-  const url = makeOutputUrl(projectId, found.userId, found.buildId, filename);
+  const url = makeOutputUrl(projectId, found.userId, found.buildId, filename,
+    found.clsiServerId, found.editorId, found.compileGroup);
   return { ok: true, tab, url };
 }
 

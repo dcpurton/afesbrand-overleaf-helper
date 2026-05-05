@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "AFES Brand Factory Overleaf Helper",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "Copies or downloads compiled files from an AFES Brand Factory Overleaf project",
   "homepage_url": "https://github.com/dcpurton/afesbrand-overleaf-helper",
   "minimum_chrome_version": "116",
